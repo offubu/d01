@@ -1,0 +1,289 @@
+////////////////////////
+D1Ch6Ex11.js
+////////////////////////
+//  each constraint has : inequality; linear_equation; intersections;
+
+class Intersection{
+    constructor(base, intersector){
+
+        if(intersector.vars.length==1)
+        this.intersection_point = [];
+
+    }
+}
+
+class Constraint{
+    constructor(c_str){
+        this.inequality = c_str;
+
+        this.vars=new Set();
+        for(let c of c_str.replace(/[^a-z]/g,'')) this.vars.add(c);
+        this.vars = [...this.vars];
+        
+        this.y_factor = c_str.match(/\d?y/g);
+        this.x_factor = c_str.match(/\d?x/g);
+        if(this.y_factor!=null){
+            if(this.y_factor[0].replace('y','')=='') this.y_factor=1;
+            else this.y_factor=this.y_factor[0].replace('y','');
+        }
+
+        if(this.x_factor!=null){
+            if(this.x_factor[0].replace('x','')=='') this.x_factor=1;
+            else this.x_factor=this.x_factor[0].replace('x','');
+        }
+        
+        this.lin_eq = c_str.replace(/[<>]/g,'');
+        this.y_or_x_subject_lin_eq = ""
+        if(this.x_factor==null || this.y_factor==null) this.y_or_x_subject_lin_eq = this.lin_eq;
+        else {
+            let m = -this.x_factor/this.y_factor;
+
+        }
+        
+
+        this.constraint = c_str.replace(/[^<>=]/g,'');
+        
+        this.intersections = []
+    }
+}
+
+//  receive constraint as string and map to operation sequence
+class ConstraintSet {
+    c=[];
+    constructor(c_str_set, x, y){  //  constraint c
+        this.xlim=x;
+        this.ylim=y;
+        
+        for(let c_str of c_str_set) this.c.push(new Constraint(c_str));
+        
+        for(let c_i=0;c_i<this.c.length;c_i++){
+            for(let i_i=0;i_i<this.c.length;i_i++){  
+                if(i_i==c_i) continue;
+                this.c[c_i].intersections.push(
+                    new Intersection( this.c[c_i], this.c[i_i] )
+                )
+            }
+        }
+
+        for(let c=0;c<c_str_set.length;c++){
+            // this.intersections(c);
+        }
+    }
+}
+
+//  solely for constraint inequalities able to be rearranged to linear equations of the form "y = mx + b"
+let LINEAR_constraints = [  
+    "y<=x",
+    "3x+5y>=60",
+    "y>=5",
+    "x<=13",
+    "x>=0",
+    "y>=0",
+]
+
+let ex11 = new ConstraintSet(LINEAR_constraints,25,25);
+//  find all constraint intersections, these are possible feasibility region R bounds
+//  remove all inequalities and treat constraints as linear equations to find their intersections
+
+// console.log(JSON.parse(JSON.stringify(ex11)))
+// console.log(ex11.c[0].intersections);
+// console.log(ex11.c[0].vars);
+for(let c of ex11.c){
+    console.log("\tc:",c)
+}
+// console.log(constraints)
+
+
+function factorise(s){
+    let vars = new Set();
+    for(let c of s.replace(/[^a-z]/g,'')) vars.add(c);
+}
+
+// factorise("3x2a+3y5x+18z^3>=0218934028394");
+
+// for(let c of LINEAR_constraints) console.log("constraintReplace: ",c.replace(/[^<>=]/g,''));
+
+// console.log("3x+2x+4x+6y=40".match(/\dx/).filter(a=>a!=''))
+let test_s = "20x+40x+6y+y-20=40"
+console.log(test_s, ":",test_s.match(/\d?y/g))
+console.log("    coeff*Var:",test_s.match(/(\d*\w)/g))
+
+console.log("    alphaNumeric \\w:",test_s.match(/\w/g))
+console.log("    alphaNumeric \\w*:",test_s.match(/\w*/g))
+console.log("    alphaNumeric (\\w):",test_s.match(/(\w)/g))
+console.log("    alphaNumeric (\\w*):",test_s.match(/(\w)*/g))
+console.log("    Yfactors (/\\d*y/g):",test_s.match(/\d*y/g))
+console.log("    Yfactors (/\\d*y/g):",/\d*y/g.exec(test_s))
+console.log("    Yfactors (/\\d*y/g):",/\d*y/g.exec(test_s)[0].length)
+
+let tokens = []
+console.log("    Yfactors (/\\d*y/g):",/\d*y/g.exec(test_s)[0].length)
+
+console.log("    nonAlphaNumeric \\W:",test_s.match(/\W/g))
+console.log("    nonAlphaNumeric \\W*:",test_s.match(/\W*/g))
+console.log("    nonAlphaNumeric (\\W):",test_s.match(/(\W)/g))
+console.log("    nonAlphaNumeric (\\W*):",test_s.match(/(\W*)/g))
+
+if("y".match(/d?y/g)[0].replace('y','')=='') console.log("1");
+console.log("ymatch:","y".match(/d?y/g));
+console.log("xmatch:","x".match(/d?y/g));
+
+function y_subjectify(constraint, subj='y'){
+
+}
+
+function bi_simultaneous(a,b){
+
+}
+////////////////////////
+////////////////////////
+
+////////////////////////
+D2Ch1_4.js
+////////////////////////
+// Example 4
+
+class CostMatrix{
+    constructor(srcs, deps, costs){
+        this.sources = [];
+        this.depots = [];
+        for(let s of srcs) {
+            let cs = {id: s.id, supply: s.supply};
+            this.sources.push(cs);
+        }
+        for(let d of deps) {
+            let cd = {id: d.id, demand: d.demand};
+            this.depots.push(cd);
+        }
+        // this.sources =srcs;
+        // this.depots =deps;
+
+        this.supply =0;
+        this.demand =0;
+        for(let s of srcs) this.supply +=s.supply;
+        for(let d of deps) this.demand +=d.demand;
+        this.balanced =false;
+        if(this.supply==this.demand) this.balanced =true;
+
+        this.paths =[];
+        this.possible_degenerate_paths =[]
+
+        let pi =0;
+        for(let n=0;n<deps.length;n++){
+            for(let m=0;m<srcs.length;m++){
+                this.paths.push( { id:srcs[m].id+deps[n].id, cost: costs[pi++] } )
+            }
+        }
+
+        this.best_cost =0;
+        //nwc
+        // for(let n=0;n<deps.length;n++){
+        //     for(let m=0;m<srcs.length;m++){
+        //         if(this.sources[m].supply ==0) continue;
+        //         if(this.depots[n].demand >= this.sources[m].supply) {
+        //             this.best_cost +=this.paths[n*srcs.length +m].cost *this.sources[m].supply;
+        //             // this.nwcLog(n,m,"d",srcs.length);
+        //             this.depots[n].demand -=this.sources[m].supply;
+        //             this.sources[m].supply -=this.sources[m].supply;
+        //         }else{
+        //             this.best_cost +=this.paths[n*srcs.length +m].cost *this.depots[n].demand;
+        //             // this.nwcLog(n,m,"s",srcs.length);
+        //             this.sources[m].supply -=this.depots[n].demand;
+        //             this.depots[n].demand -=this.depots[n].demand;
+        //         }
+        //         if(this.depots[n].demand ==0) break;
+        //     }
+        // }
+    }
+
+    json(){
+        console.log(JSON.parse(JSON.stringify(this)))
+    }
+
+    reset(s,d){
+        this.sources = s;
+        this.depots = d;
+    }
+
+    nwc(){
+        let ts = []; for(let s of this.sources) ts.push(s);
+        let td = []; for(let d of this.depots) td.push(d);
+
+        for(let n=0;n<td.length;n++){
+            for(let m=0;m<ts.length;m++){
+                if(ts[m].supply ==0) continue;
+                if(td[n].demand >= ts[m].supply) {
+                    this.best_cost +=this.paths[n*ts.length +m].cost *ts[m].supply;
+                    // this.nwcLog(n,m,"d",srcs.length);
+                    td[n].demand -=ts[m].supply;
+                    ts[m].supply -=ts[m].supply;
+                }else{
+                    this.best_cost +=this.paths[n*ts.length +m].cost *td[n].demand;
+                    // this.nwcLog(n,m,"s",srcs.length);
+                    ts[m].supply -=td[n].demand;
+                    td[n].demand -=td[n].demand;
+                }
+                if(td[n].demand ==0) break;
+            }
+        }
+    }
+
+    nwcLog(n,m,ds,sl){
+        console.log( "(",n,",",m,")",ds,"+",
+            this.paths[n*srcs.length +m].id,
+            "pathCost:",this.paths[n*sl +m].cost,
+            "demand:", this.depots[n].demand,
+            "supply:", this.sources[m].supply,
+            "tot:", this.paths[n*sl +m].cost *this.depots[n].demand
+        )
+    }
+}
+
+
+
+let sources = [
+    { id: 'W', supply: 30 },  { id: 'X', supply: 20 },
+    { id: 'Y', supply: 35 },  { id: 'Z', supply: 35 },
+]
+let depots = [
+    { id: 'A', demand: 30 },  { id: 'B', demand: 40 },
+    { id: 'C', demand: 50 },
+]
+let costs = [ 10,4,3,11, 11,5,8,10, 6,9,7,9 ];  //  to correspond with decision variables
+
+let x4 = new CostMatrix(sources,depots,costs);
+// x4.nwc();
+// _nwc(x4,sources,depots);
+_nwc(x4);
+x4.reset(sources, depots);
+x4.json();
+console.log(sources);
+
+
+function _nwc(cm){
+    let ts = []; for(let s of cm.sources) ts.push(s);
+    let td = []; for(let d of cm.depots) td.push(d);
+
+    for(let n=0;n<td.length;n++){
+        for(let m=0;m<ts.length;m++){
+            if(ts[m].supply ==0) continue;
+            if(td[n].demand >= ts[m].supply) {
+                cm.best_cost +=cm.paths[n*ts.length +m].cost *ts[m].supply;
+                // this.nwcLog(n,m,"d",srcs.length);
+                td[n].demand -=ts[m].supply;
+                ts[m].supply -=ts[m].supply;
+            }else{
+                cm.best_cost +=cm.paths[n*ts.length +m].cost *td[n].demand;
+                // this.nwcLog(n,m,"s",srcs.length);
+                ts[m].supply -=td[n].demand;
+                td[n].demand -=td[n].demand;
+            }
+            if(td[n].demand ==0) break;
+        }
+    }
+}
+
+
+// console.log(x4.sources)
+////////////////////////
+////////////////////////
